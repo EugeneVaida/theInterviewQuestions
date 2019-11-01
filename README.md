@@ -138,7 +138,65 @@ public class RoleInfoAttribute : System.Attribute
 
 ___
 11. ### Как обеспечить использование именованных параметров в конструкторе атрибута?  
-При описании конструктора/ов атрибута нужно указать его параметры. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;При проектировании *Атрибута*, требуеться объявлять поля и свойсва как публичные, тк при задании именного параметра в конструктор атрибута передается имя свойства или поля, которое должно принять этот параметр. При этом они должны иметь свойство доступа ```public```.  
+Для примера примеведен атрибут с двумя полями(Id, Name), которые являются открытыми:  
+```c#
+public class TestAttribute : System.Attribute
+{
+	private string _name;
+	public int A;
+	public int B;
+	public int C;
+	
+	public TestAttribute(string name)
+	{
+		this._name = name;
+	}
+	
+	public TestAttribute(string name, int a, int b, int c)
+	{
+		this._name = name;
+		this.A = a;
+		this.B = b;
+		this.C = c;		
+	}
+}
+
+// Именованные параметры являются необязательными и могут указываться в любом порядке.
+// Сначала указываются позиционные параметры. Например, эти три атрибута являются валидными:
+[Test("A")]
+public class A{}
+
+[Test("B", C=3, B=2)]
+public class B{}
+
+[Test("C", A=1, C=0, B=2)]
+public class C{}
+
+void Main()
+{
+	var A = new A();
+	var B = new B();
+	var C = new C();
+	
+	ReflectionDumper<A>.Dump(); // A: 0; B: 0; C: 0
+	ReflectionDumper<B>.Dump(); // A: 0; B: 2; C: 3
+	ReflectionDumper<C>.Dump(); // A: 1; B: 2; C: 0
+}
+```  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Данные о атрибутах описывающих каждый класс достаються с помощью рефлексии:  
+```c#
+public static class ReflectionDumper<T> where T : class
+{
+	public static void Dump()
+	{
+		Type t = typeof(T);
+    	object[] attrs = t.GetCustomAttributes(false);
+		attrs.Dump();
+	}
+}
+```  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;В то ж время пока к классу с атрибутом не применена рефлексия, атрибут не размещается в памяти, и никакого влияния на данный класс не оказывает.
 
 ___
 12. ### В чем различие между Finalize и Dispose?  
@@ -154,7 +212,7 @@ ___
 
 ___
 15. ### Какие типы можно использовать в предложении foreach?  
-+  
+Любые типы реализующие интерфейс IEnumerable.
 
 ___
 16. ### В чем различие между классом и структурой?  
@@ -162,7 +220,7 @@ ___
 
 ___
 17. ### Что означает модификатор virtual?  
-+  
+Дает возможность переопределить метод в классе наследнике с помощью ключевого слово ```override```
 
 ___
 18. ### Чем отличается event от delegate?  
