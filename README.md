@@ -343,7 +343,38 @@ ___
 +  
 
 ___
-52. ### Рефлексия в C#  
+52. ### Рефлексия в C#. Возможно ли с помощью рефлексии в C# вызвать private метод другого класса?
+Если да, то как?
+
+Рефлексия представляет собой процесс выявления типов во время выполнения приложения. Каждое приложение содержит набор используемых классов, интерфейсов, а также их методов, свойств и прочих кирпичиков, из которых складывается приложение. И рефлексия как раз и позволяет определить все эти составные элементы приложения.
+ 
+ Пример рефлексии, который позволяет вызвать private метод другого класса.
+``` C#
+
+using System.Reflection; 
+ 
+class Program 
+    { 
+        static void Main(string[] args) 
+        { 
+            Another another = new Another(); 
+            Type type = another.GetType(); 
+ 
+            MethodInfo metin = type.GetMethod("Hex",BindingFlags.Instance | BindingFlags.NonPublic); 
+            metin.Invoke(another, null); 
+        } 
+    } 
+ 
+    class Another 
+    { 
+        void Hex() 
+        { 
+            Console.WriteLine("You are bigger!!"); 
+            Console.ReadLine(); 
+        } 
+    } 
+
+```
 
 ___
 53. ### ref and out 
